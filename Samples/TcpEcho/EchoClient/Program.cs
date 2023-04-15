@@ -6,7 +6,7 @@ using System.Text;
 
 var applicationExit = ConsoleEx.HookCtrlCCancellation();
 
-var groupTask = TaskScope.RunScopeAsync(applicationExit, async group =>
+var groupTask = TaskGoup.RunScopeAsync(applicationExit, async group =>
 {
     // Create and connect the socket, registering it as a resource owned by the group.
     var clientSocket = new GracefulCloseSocket { Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) };

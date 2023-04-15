@@ -9,7 +9,7 @@ A task scope provides a scope in which work is done.
 At the end of that scope, the task scope (asynchronously) waits for all of its work to complete.
 
 ```C#
-var scopeTask = TaskScope.RunScopeAsync(default, scope =>
+var scopeTask = TaskGroup.RunScopeAsync(default, scope =>
 {
     scope.Run(async token => await Task.Delay(TimeSpan.FromSeconds(1), token));
     scope.Run(async token => await Task.Delay(TimeSpan.FromSeconds(2), token));
@@ -17,7 +17,7 @@ var scopeTask = TaskScope.RunScopeAsync(default, scope =>
 await scopeTask; // Completes after 2 seconds.
 ```
 
-A `TaskScope` is started with `TaskScope.RunScopeAsync`.
+A `TaskGroup` is started with `TaskGroup.RunScopeAsync`.
 The delegate passed to `RunScopeAsync` is the first work item; it can do its own work and/or add other work items to that same group.
 When all the work items have completed, then the group scope closes, and the task returned from `RunScopeAsync` completes.
 
@@ -26,7 +26,7 @@ Conceptually, the task group scope ends with a kind of `Task.WhenAll`, but with 
 As long as the work is added before all other work completes, the task group will "extend" its logical `WhenAll` to include the additional work.
 
 ```C#
-var scopeTask = TaskScope.RunScopeAsync(default, scope =>
+var scopeTask = TaskGroup.RunScopeAsync(default, scope =>
 {
     // Any scope work can kick off other scope work.
     scope.Run(async token =>
@@ -47,7 +47,7 @@ If any work throws an exception (except `OperationCanceledException`), then that
 The task group immediately enters a canceled state (see below), cancelling all of its other work.
 
 ```C#
-var scopeTask = TaskScope.RunScopeAsync(default, scope =>
+var scopeTask = TaskGroup.RunScopeAsync(default, scope =>
 {
     scope.Run(async token =>
     {
@@ -65,7 +65,7 @@ At the end of the task group scope, the task group will still wait for all of it
 Once all of the work has completed, then the task group task will re-raise the first exception from its faulted work.
 
 ```C#
-var scopeTask = TaskScope.RunScopeAsync(default, scope =>
+var scopeTask = TaskGroup.RunScopeAsync(default, scope =>
 {
     scope.Run(async token =>
     {
@@ -86,10 +86,10 @@ Task groups provide `CancellationToken` parameters to all of their work, and it 
 The task group will cancel itself if any work item faults (with an exception other than `OperationCanceledException`).
 
 Task groups also take a `CancellationToken` as parameter to the static `RunScopeAsync` methods to enable cancellation from "upstream"; e.g., if the application is shutting down.
-Task groups can also be cancelled manually (via `TaskScope.CancellationTokenSource`) if the program logic wishes to stop the task group for any reason.
+Task groups can also be cancelled manually (via `TaskGroup.CancellationTokenSource`) if the program logic wishes to stop the task group for any reason.
 
 ```C#
-var scopeTask = TaskScope.RunScopeAsync(default, scope =>
+var scopeTask = TaskGroup.RunScopeAsync(default, scope =>
 {
     // Apply a timeout for all work sent to this scope.
     scope.CancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(2));
@@ -106,7 +106,7 @@ A task scope can own resources.
 These resources will be disposed by the task group after all its work is done.
 
 ```C#
-var scopeTask = TaskScope.RunScopeAsync(default, async scope =>
+var scopeTask = TaskGroup.RunScopeAsync(default, async scope =>
 {
     await scope.AddResourceAsync(myDisposableResource);
 
@@ -122,14 +122,14 @@ All exceptions raised by disposal of any resource are ignored.
 The usual pattern for task scopes is to cancel on failure and ignore success.
 Sometimes, we want to "race" several work items to produce a result; in this case, we want the opposite: ignore failures and cancel on success.
 
-The usual pattern is to create a race child group via `TaskScope.RunScopeAsync`.
+The usual pattern is to create a race child group via `TaskGroup.RunScopeAsync`.
 This creates a separate group along with a race result that are used for races.
 To race work, call `Race` instead of `Run`.
 The first successful `Race` will cancel all the others.
 Once all races have completed (i.e., the race child group's scope is complete), then the results of the race are returned from `RaceGroupAsync`.
 
 ```C#
-var scopeTask = TaskScope.RunScopeAsync<int>(default, scope =>
+var scopeTask = TaskGroup.RunScopeAsync<int>(default, scope =>
 {
     scope.Race(async token => { await Task.Delay(TimeSpan.FromSeconds(1), token); return 1; });
     scope.Race(async token => { await Task.Delay(TimeSpan.FromSeconds(2), token); return 2; });

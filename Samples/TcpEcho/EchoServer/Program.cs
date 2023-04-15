@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 var applicationExit = ConsoleEx.HookCtrlCCancellation();
 
-var serverGroupTask = TaskScope.RunScopeAsync(applicationExit, async serverGroup =>
+var serverGroupTask = TaskGoup.RunScopeAsync(applicationExit, async serverGroup =>
 {
     // Define the "listener"; this work accepts new socket connections.
     async IAsyncEnumerable<GracefulCloseSocket> ListenAsync()
@@ -42,7 +42,7 @@ var serverGroupTask = TaskScope.RunScopeAsync(applicationExit, async serverGroup
                 // Create a linked child group to handle the individual connection.
                 // The child group is linked to the parent via the cancellation token, so cancellation will flow down.
                 // Normally, exceptions would also flow up, but the try/catch prevents that.
-                await TaskScope.RunScopeAsync(ct, async group =>
+                await TaskGoup.RunScopeAsync(ct, async group =>
                 {
                     // Each child group owns its client socket connection.
                     await group.AddResourceAsync(socket);

@@ -8,7 +8,7 @@ namespace Nito.StructuredConcurrency;
 /// <summary>
 /// Provides methods for creating and running different types of task groups.
 /// </summary>
-public static class TaskScope
+public static class TaskGoup
 {
     /// <summary>
     /// Creates a new <see cref="RunTaskScope"/> and runs the specified work as the first work task.

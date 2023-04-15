@@ -16,7 +16,7 @@ public class TaskScopeUnitTests
         Task? task1 = null;
         Task? task2 = null;
 
-        var groupTask = TaskScope.RunScopeAsync(default, group =>
+        var groupTask = TaskGoup.RunScopeAsync(default, group =>
         {
             task1 = group.RunAsync(async _ => { await task1Signal.Task; return 0; });
             task2 = group.RunAsync(async _ => { await task2Signal.Task; return 0; });
@@ -51,7 +51,7 @@ public class TaskScopeUnitTests
         Task? task1 = null;
         Task? task2 = null;
 
-        var groupTask = TaskScope.RunScopeAsync(default, group =>
+        var groupTask = TaskGoup.RunScopeAsync(default, group =>
         {
 #pragma warning disable CS0162 // Unreachable code detected
             task1 = group.RunAsync(async _ => { await task1Signal.Task; throw new InvalidOperationException("1"); return 0; });
@@ -78,7 +78,7 @@ public class TaskScopeUnitTests
         Task? task1 = null;
         Task? task2 = null;
 
-        var groupTask = TaskScope.RunScopeAsync(default, group =>
+        var groupTask = TaskGoup.RunScopeAsync(default, group =>
         {
             task1 = group.RunAsync(async _ => { await task1Signal.Task; return 0; });
             task2 = group.RunAsync(async _ => { await Task.Delay(Timeout.InfiniteTimeSpan, cts.Token); return 0; });
@@ -101,7 +101,7 @@ public class TaskScopeUnitTests
     [Fact]
     public async Task EmptyGroup_NoDeadlock()
     {
-        await TaskScope.RunScopeAsync(default, group => { });
+        await TaskGoup.RunScopeAsync(default, group => { });
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class TaskScopeUnitTests
     {
         int wasdisposed = 0;
 
-        await TaskScope.RunScopeAsync(default, async group =>
+        await TaskGoup.RunScopeAsync(default, async group =>
         {
             await group.AddResourceAsync(Disposable.Create(() => Interlocked.Exchange(ref wasdisposed, 1)));
         });
@@ -120,7 +120,7 @@ public class TaskScopeUnitTests
     [Fact]
     public async Task Resource_ThrowsException_Ignored()
     {
-        await TaskScope.RunScopeAsync(default, async group =>
+        await TaskGoup.RunScopeAsync(default, async group =>
         {
             await group.AddResourceAsync(Disposable.Create(() => throw new InvalidOperationException("nope")));
         });
@@ -131,7 +131,7 @@ public class TaskScopeUnitTests
     {
         int wasdisposed = 0;
 
-        await TaskScope.RunScopeAsync(default, async group =>
+        await TaskGoup.RunScopeAsync(default, async group =>
         {
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
             var resource = await group.RunAsync(async ct => Disposable.Create(() => Interlocked.Exchange(ref wasdisposed, 1)));

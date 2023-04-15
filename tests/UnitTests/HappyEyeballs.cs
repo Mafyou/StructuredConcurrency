@@ -10,10 +10,10 @@ public sealed class HappyEyeballs
 {
     public async Task<Socket> ConnectAsync(string hostname, CancellationToken cancellationToken = default)
     {
-        return await TaskGroup.RunGroupAsync(cancellationToken, async group =>
+        return await TaskScope.RunScopeAsync(cancellationToken, async group =>
         {
             var ipAddresses = await GetHostAddressesAsync(hostname, group.CancellationToken);
-            return await TaskGroup.RaceGroupAsync<Socket>(group.CancellationToken, async raceGroup =>
+            return await TaskScope.RaceScopeAsync<Socket>(group.CancellationToken, async raceGroup =>
             {
                 foreach (var ipAddress in ipAddresses)
                 {

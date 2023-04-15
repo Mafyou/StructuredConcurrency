@@ -12,7 +12,7 @@ var connections = new ConnectionCollection();
 
 var applicationExit = ConsoleEx.HookCtrlCCancellation();
 
-var serverGroupTask = TaskGroup.RunGroupAsync(applicationExit, async serverGroup =>
+var serverGroupTask = TaskScope.RunScopeAsync(applicationExit, async serverGroup =>
 {
     // Define the "listener"; this work accepts new socket connections.
     async IAsyncEnumerable<Socket> ListenAsync()
@@ -48,7 +48,7 @@ var serverGroupTask = TaskGroup.RunGroupAsync(applicationExit, async serverGroup
             ChatConnection? chatConnection = null;
             try
             {
-                await TaskGroup.RunGroupAsync(ct, async group =>
+                await TaskScope.RunScopeAsync(ct, async group =>
                 {
                     chatConnection = new ChatConnection(group, new PipelineSocket(group, socket));
                     var clientConnection = connections.Add(chatConnection);

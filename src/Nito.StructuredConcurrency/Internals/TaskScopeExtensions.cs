@@ -5,11 +5,11 @@ namespace Nito.StructuredConcurrency.Internals;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable CA1062 // Validate arguments of public methods
 
-public static class TaskGroupExtensions
+public static class TaskScopeExtensions
 {
-    public static void Run(this TaskGroupCore group, Func<CancellationToken, ValueTask> work) => _ = RunAsync(group, work.WithResult());
+    public static void Run(this TaskScopeCore group, Func<CancellationToken, ValueTask> work) => _ = RunAsync(group, work.WithResult());
 
-    public static Task<T> RunAsync<T>(this TaskGroupCore group, Func<CancellationToken, ValueTask<T>> work)
+    public static Task<T> RunAsync<T>(this TaskScopeCore group, Func<CancellationToken, ValueTask<T>> work)
     {
         return group.WorkAsync(CancelOnException(group.CancellationTokenSource, work));
 
@@ -28,7 +28,7 @@ public static class TaskGroupExtensions
             };
     }
 
-    public static void Race<T>(this TaskGroupCore group, RaceResult<T> raceResult, Func<CancellationToken, ValueTask<T>> work)
+    public static void Race<T>(this TaskScopeCore group, RaceResult<T> raceResult, Func<CancellationToken, ValueTask<T>> work)
     {
         _ = group.WorkAsync(async ct =>
         {
@@ -45,5 +45,5 @@ public static class TaskGroupExtensions
         });
     }
 
-    public static Task<T> RunAsync<T>(this RunTaskGroup group, Func<CancellationToken, ValueTask<T>> work) => group.DoRunAsync(work);
+    public static Task<T> RunAsync<T>(this RunTaskScope group, Func<CancellationToken, ValueTask<T>> work) => group.DoRunAsync(work);
 }

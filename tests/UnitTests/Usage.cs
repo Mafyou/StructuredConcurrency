@@ -8,7 +8,7 @@ public class Usage
     [Fact]
     public async Task ImplicitWhenAll()
     {
-        await TaskGroup.RunGroupAsync(default, group =>
+        await TaskScope.RunScopeAsync(default, group =>
         {
             group.Run(async token => await Task.Delay(TimeSpan.FromMilliseconds(1), token));
             group.Run(async token => await Task.Delay(TimeSpan.FromMilliseconds(2), token));
@@ -20,7 +20,7 @@ public class Usage
     {
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            await TaskGroup.RunGroupAsync(default, group =>
+            await TaskScope.RunScopeAsync(default, group =>
             {
                 var channel = Channel.CreateBounded<int>(10);
 
@@ -66,7 +66,7 @@ public class Usage
     {
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            await TaskGroup.RunGroupAsync(default, group =>
+            await TaskScope.RunScopeAsync(default, group =>
             {
                 var channel = Channel.CreateBounded<int>(10);
 
@@ -116,7 +116,7 @@ public class Usage
     [Fact]
     public async Task Pipeline()
     {
-        var result = await TaskGroup.RunGroupAsync(default, async group =>
+        var result = await TaskScope.RunScopeAsync(default, async group =>
         {
             // All the channels and transformation methods are asynchronously
             // scoped to this "CalculateUsingTemporaryPipelineAsync" method.
@@ -194,7 +194,7 @@ public class Usage
     [Fact]
     public async Task ExplicitCancel()
     {
-        var result = await TaskGroup.RunGroupAsync(default, group =>
+        var result = await TaskScope.RunScopeAsync(default, group =>
         {
             // All the channels and transformation methods are asynchronously
             // scoped to this "CalculateUsingTemporaryPipelineAsync" method.
@@ -271,9 +271,9 @@ public class Usage
     [Fact]
     public async Task Timeouts()
     {
-        var groupTask = TaskGroup.RunGroupAsync(default, async group =>
+        var groupTask = TaskScope.RunScopeAsync(default, async group =>
         {
-            await TaskGroup.RunGroupAsync(group.CancellationToken, async childGroup =>
+            await TaskScope.RunScopeAsync(group.CancellationToken, async childGroup =>
             {
                 childGroup.CancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(10));
                 await Task.Delay(Timeout.InfiniteTimeSpan, childGroup.CancellationToken);

@@ -14,7 +14,7 @@ namespace Nito.StructuredConcurrency.Advanced;
 /// <item>Disposing the task group does not cancel the task group; it just waits for the child tasks. You can explicitly cancel the task group before disposing, if desired.</item>
 /// </list>
 /// </summary>
-public sealed class TaskGroupCore : IAsyncDisposable
+public sealed class TaskScopeCore : IAsyncDisposable
 {
     private readonly DynamicTaskWhenAll _tasks;
     private readonly TaskCompletionSource _groupScope;
@@ -24,7 +24,7 @@ public sealed class TaskGroupCore : IAsyncDisposable
     /// Creates a task group, optionally linking it to an upstream cancellation source.
     /// </summary>
     /// <param name="cancellationToken">The upstream cancellation token.</param>
-    internal TaskGroupCore(CancellationToken cancellationToken = default)
+    internal TaskScopeCore(CancellationToken cancellationToken = default)
     {
         CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _tasks = new();

@@ -5,11 +5,11 @@
 /// </summary>
 public static class TaskGroupFactory
 {
-    /// <inheritdoc cref="TaskGroupCore.TaskGroupCore"/>
-    public static TaskGroupCore CreateTaskGroupCore(CancellationToken cancellationToken) => new(cancellationToken);
+    /// <inheritdoc cref="TaskScopeCore.TaskScopeCore"/>
+    public static TaskScopeCore CreateTaskGroupCore(CancellationToken cancellationToken) => new(cancellationToken);
 
-    /// <inheritdoc cref="RunTaskGroup.RunTaskGroup"/>
+    /// <inheritdoc cref="RunTaskScope.RunTaskScope"/>
 #pragma warning disable CA2000 // Dispose objects before losing scope
-    public static RunTaskGroup CreateRunTaskGroup(CancellationToken cancellationToken) => new(new(cancellationToken));
+    public static RunTaskScope CreateRunTaskGroup(CancellationToken cancellationToken) => new(new(cancellationToken));
 #pragma warning restore CA2000 // Dispose objects before losing scope
 }

@@ -13,14 +13,14 @@ namespace Nito.StructuredConcurrency;
 /// <item>Disposing the task group does not cancel the task group; it just waits for the child tasks. You can explicitly cancel the task group before disposing, if desired.</item>
 /// </list>
 /// </summary>
-public sealed class RunTaskGroup : IAsyncDisposable
+public sealed class RunTaskScope : IAsyncDisposable
 {
-    private readonly TaskGroupCore _group;
+    private readonly TaskScopeCore _group;
 
     /// <summary>
     /// Creates a task group.
     /// </summary>
-    internal RunTaskGroup(TaskGroupCore group)
+    internal RunTaskScope(TaskScopeCore group)
     {
         _group = group;
     }

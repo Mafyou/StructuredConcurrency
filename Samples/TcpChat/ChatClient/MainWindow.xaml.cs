@@ -14,7 +14,7 @@ namespace ChatClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        private RunTaskGroup? _group;
+        private RunTaskScope? _group;
         private ChatConnection? _chatConnection;
 
         public MainWindow()

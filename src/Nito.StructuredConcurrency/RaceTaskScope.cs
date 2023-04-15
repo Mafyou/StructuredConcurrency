@@ -12,30 +12,30 @@ namespace Nito.StructuredConcurrency;
 /// </list>
 /// </summary>
 /// <typeparam name="TResult">The type of the value that is the result of the race.</typeparam>
-public sealed class RaceTaskGroup<TResult> : IAsyncDisposable
+public sealed class RaceTaskScope<TResult> : IAsyncDisposable
 {
-    private readonly TaskGroupCore _group;
+    private readonly TaskScopeCore _group;
     private readonly RaceResult<TResult> _raceResult;
 
     /// <summary>
     /// Creates a racing task group.
     /// </summary>
-    internal RaceTaskGroup(TaskGroupCore group, RaceResult<TResult> raceResult)
+    internal RaceTaskScope(TaskScopeCore group, RaceResult<TResult> raceResult)
     {
         _group = group;
         _raceResult = raceResult;
     }
 
-    /// <inheritdoc cref="RunTaskGroup.CancellationToken"/>
+    /// <inheritdoc cref="RunTaskScope.CancellationToken"/>
     public CancellationToken CancellationToken => CancellationTokenSource.Token;
 
-    /// <inheritdoc cref="RunTaskGroup.CancellationTokenSource"/>
+    /// <inheritdoc cref="RunTaskScope.CancellationTokenSource"/>
     public CancellationTokenSource CancellationTokenSource => _group.CancellationTokenSource;
 
-    /// <inheritdoc cref="RunTaskGroup.AddResourceAsync"/>
+    /// <inheritdoc cref="RunTaskScope.AddResourceAsync"/>
     public ValueTask AddResourceAsync(object? resource) => _group.AddResourceAsync(resource);
 
-    /// <inheritdoc cref="RunTaskGroup.DisposeAsync"/>
+    /// <inheritdoc cref="RunTaskScope.DisposeAsync"/>
     public ValueTask DisposeAsync() => _group.DisposeAsync();
 
     /// <summary>
@@ -49,11 +49,11 @@ public sealed class RaceTaskGroup<TResult> : IAsyncDisposable
 
 #pragma warning disable CA1068 // CancellationToken parameters must come last
 #pragma warning disable CA2000 // Dispose objects before losing scope
-    internal static async Task<TResult> RaceGroupAsync(CancellationToken cancellationToken, Func<RaceTaskGroup<TResult>, ValueTask> work)
+    internal static async Task<TResult> RaceScopeAsync(CancellationToken cancellationToken, Func<RaceTaskScope<TResult>, ValueTask> work)
     {
         var raceResult = new RaceResult<TResult>();
 
-        var raceGroup = new RaceTaskGroup<TResult>(new TaskGroupCore(cancellationToken), raceResult);
+        var raceGroup = new RaceTaskScope<TResult>(new TaskScopeCore(cancellationToken), raceResult);
         await using (raceGroup.ConfigureAwait(false))
             raceGroup._group.Run(_ => work(raceGroup));
 
